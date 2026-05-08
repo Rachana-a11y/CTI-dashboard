@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-fluid px-4">
+
+    <!-- Title -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-info">🌐 DNS Relationship Graph</h3>
+        <span class="badge bg-secondary px-3 py-2">
+            Source: <span id="source">Loading...</span>
+        </span>
+    </div>
+
+    <!-- Graph Card -->
+    <div class="graph-card">
+        <div id="cy"></div>
+    </div>
+
+</div>
+
+<!-- Cytoscape -->
+<script src="https://unpkg.com/cytoscape@3.26.0/dist/cytoscape.min.js"></script>
+
+<script>
+    const ioc = "{{ ioc }}";
+
+    fetch(`/api/dnsgraph/?ioc=${ioc}`)
+    .then(res => res.json())
+    .then(data => {
+
+        document.getElementById("source").innerText = data.source || "Generated";
+
+        const cy = cytoscape({
+            container: document.getElementById('cy'),
+
+            elements: data.elements,
+
+            style: [
+                {
+                    selector: 'node',
+                    style: {
+                        'label': 'data(id)',
+                        'background-color': '#00ffc3',
+                        'color': '#fff',
+                        'font-size': '10px',
+                        'text-outline-color': '#000',
+                        'text-outline-width': 1
+                    }
+                },
+                {
+                    selector: 'node[type="root"]',
+                    style: { 'background-color': '#ff4d6d' }
+                },
+                {
+                    selector: 'node[type="subdomain"]',
+                    style: { 'background-color': '#3aa0ff' }
+                },
+                {
+                    selector: 'node[type="related"]',
+                    style: { 'background-color': '#ffaa00' }
+                },
+                {
+                    selector: 'edge',
+                    style: {
+                        'width': 2,
+                        'line-color': '#888',
+                        'target-arrow-color': '#888',
+                        'target-arrow-shape': 'triangle',
+                        'curve-style': 'bezier'
+                    }
+                }
+            ],
+
+            layout: {
+                name: 'cose',
+                animate: true,
+                fit: true,
+                padding: 30
+            }
+        });
+
+        cy.on('tap', 'node', function(evt){
+            const node = evt.target;
+            alert("Clicked: " + node.id());
+        });
+
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Failed to load graph");
+    });
+</script>
+
+{% endblock %}

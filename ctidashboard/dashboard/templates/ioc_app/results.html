@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'ioc_app/css/styles.css' %}">
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<div class="container mt-4">
+
+  <!-- === CHARTS FIRST SECTION (REAL CHART) === -->
+  <div class="row mb-4">
+    <div class="col-lg-12">
+      <div class="card p-4 shadow-lg bg-dark text-white rounded-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h3 class="mb-0">📊 IOC Verdict Summary</h3>
+          <a href="{% url 'charts' %}" class="btn btn-warning fw-bold px-4 py-2 rounded-3">
+            🔍 View Full Charts
+          </a>
+        </div>
+        <div id="overview-chart" class="w-100" style="height: 400px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === DNS GRAPH PROMO === -->
+  <div class="row mb-5">
+    <div class="col-lg-12">
+      <div class="card bg-info text-dark p-4 rounded-4 d-flex align-items-center justify-content-between flex-lg-row flex-column">
+        <div class="text-center text-lg-start">
+          <h4 class="fw-bold mb-2">🧠 Visualize DNS Relationships</h4>
+          <p class="mb-0">Explore how the IOCs relate across DNS and IP infrastructure.</p>
+        </div>
+        <a href="{% url 'dnsgraph' %}" class="btn btn-dark fw-bold mt-3 mt-lg-0 px-4 py-2 rounded-3">
+          🌐 View DNS Graph
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- === RECENT IOC SCAN RESULTS === -->
+  <div class="text-center mb-4">
+    <img src="https://img.icons8.com/color/64/document--v1.png" alt="Recent Icon" />
+    <h3 class="text-cyan fw-bold mt-3">📄 Recent IOC Scan Results</h3>
+    <p class="text-muted">Here are the most recent analyses performed on IOCs you've searched.</p>
+  </div>
+
+  {% if records %}
+    <div class="row g-4">
+      {% for record in records %}
+        <div class="col-md-6 col-lg-4">
+          <div class="card bg-dark border-cyan p-3 h-100 shadow-lg rounded-4">
+            <div class="card-body">
+              <h5 class="fw-bold text-cyan">{{ record.ioc }}</h5>
+              <span class="badge bg-info mb-2">{{ record.ioc_type }}</span>
+              <p class="mb-2 text-light">
+                <i class="fas fa-search text-cyan"></i> <strong>Source:</strong> {{ record.source }}<br>
+                <i class="fas fa-chart-line text-cyan"></i> <strong>Score:</strong> {{ record.score }}
+              </p>
+              <a href="{{ record.link }}" class="text-info" target="_blank">
+                🔗 View Details
+              </a>
+              <div class="text-muted mt-2 small">
+                <i class="fas fa-clock"></i> {{ record.timestamp }}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-warning text-center mt-5 rounded-4 shadow-sm">
+      ⚠️ No IOC records found in the system.
+    </div>
+  {% endif %}
+
+  <!-- === NAVIGATION BUTTONS === -->
+  <div class="text-left mt-5">
+    <a href="{% url 'ioc_input' %}" class="btn btn-outline-info px-4 py-2 rounded-4"> 
+      ← Back to Dashboard
+    </a>
+    <a href="{% url 'dnsgraph' %}" class="btn btn-outline-info px-4 py-2 rounded-4" > 🌐 Full DNS Graph </a>
+    <a href="{% url 'charts' %}" class="btn btn-outline-info px-4 py-2 rounded-4" > 📊 View Charts </a>
+  </div>
+</div>
+
+<!-- === LIVE CHART SCRIPT === -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    {% if stats %}
+    const data = [{
+      values: [{{ stats.malicious }}, {{ stats.suspicious }}, {{ stats.harmless }}],
+      labels: ['Malicious', 'Suspicious', 'Harmless'],
+      type: 'pie',
+      hole: 0.35,
+      marker: {
+        colors: ['#dc2626', '#facc15', '#16a34a']
+      },
+      textinfo: 'label+percent',
+      hoverinfo: 'label+value+percent',
+      textfont: {
+        color: '#fff',
+        size: 14
+      }
+    }];
+
+    const layout = {
+      title: {
+        text: 'IOC Verdict Distribution',
+        font: { size: 18, color: '#ffffff' }
+      },
+      paper_bgcolor: '#1e293b',
+      plot_bgcolor: '#1e293b',
+      font: { color: '#ffffff' },
+      showlegend: true,
+      legend: {
+        orientation: 'h',
+        y: -0.2
+      },
+      margin: { t: 50, b: 30, l: 30, r: 30 }
+    };
+
+    Plotly.newPlot('overview-chart', data, layout, { responsive: true, displayModeBar: false });
+    {% endif %}
+  });
+</script>
+{% endblock %}

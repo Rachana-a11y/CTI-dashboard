@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  .dashboard-wrapper {
+    max-width: 1140px;
+    margin: 60px auto;
+    padding: 40px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 20px;
+    box-shadow: 0 0 60px rgba(0, 255, 255, 0.15);
+    backdrop-filter: blur(14px);
+    color: #e0f7fa;
+    animation: fadeInUp 1s ease-in-out;
+  }
+
+  .dashboard-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .dashboard-header img {
+    width: 90px;
+    margin-bottom: 15px;
+  }
+
+  .dashboard-header h1 {
+    font-weight: 800;
+    color: #00ffff;
+    text-shadow: 0 0 18px rgba(0, 255, 255, 0.4);
+  }
+
+  .nav-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 30px;
+  }
+
+  .tile {
+    background: linear-gradient(145deg, #09232f, #0b3748);
+    border-radius: 18px;
+    padding: 30px;
+    color: #ffffff;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.15);
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 2px solid #00ffff50;
+  }
+
+  .tile:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 0 30px #00ffff;
+  }
+
+  .tile i {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    color: #00ffff;
+  }
+
+  .tile h5 {
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<div class="dashboard-wrapper">
+  <div class="dashboard-header">
+    <img src="https://img.icons8.com/color/96/hacker.png" alt="Cyber Icon">
+    <h1><i class="fas fa-shield-alt"></i> CyberScope Threat Dashboard</h1>
+    <p class="text-muted">"Your central intelligence hub for cyber threat insights"</p>
+  </div>
+
+  <div class="nav-tiles">
+    <a href="{% url 'ioc_input' %}" class="tile text-decoration-none">
+      <i class="fas fa-search"></i>
+      <h5>Analyze IOC</h5>
+      <p>Submit and scan IPs, domains, or hashes</p>
+    </a>
+    <a href="{% url 'results' %}" class="tile text-decoration-none">
+      <i class="fas fa-history"></i>
+      <h5>Recent Results</h5>
+      <p>View your recent IOC scans</p>
+    </a>
+    <a href="{% url 'charts' %}" class="tile text-decoration-none">
+      <i class="fas fa-chart-bar"></i>
+      <h5>Charts</h5>
+      <p>Visualize threat intelligence data</p>
+    </a>
+    <a href="{% url 'dnsgraph' %}" class="tile text-decoration-none">
+      <i class="fas fa-project-diagram"></i>
+      <h5>DNS Graph</h5>
+      <p>Explore DNS relationship graphs</p>
+    </a>
+  </div>
+</div>
+
+{% endblock %}
